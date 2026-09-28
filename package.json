@@ -1,0 +1,36 @@
+{
+  "name": "@ijuantm/simpl",
+  "description": "CLI for the Simpl PHP framework: create projects, install add-ons and run the Docker dev stack.",
+  "version": "1.0.0",
+  "type": "module",
+  "bin": {
+    "simpl": "bin/simpl.js"
+  },
+  "files": [
+    "bin",
+    "lib"
+  ],
+  "scripts": {
+    "link": "npm link",
+    "unlink": "npm unlink -g @ijuantm/simpl"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IJuanTM/simpl-cli.git"
+  },
+  "keywords": [
+    "simpl",
+    "framework",
+    "installer",
+    "addon",
+    "docker",
+    "cli",
+    "php-framework"
+  ],
+  "author": "Iwan van der Wal",
+  "license": "GPL-3.0-only",
+  "homepage": "https://simpl.iwanvanderwal.nl/"
+}
