@@ -1,7 +1,7 @@
 {
   "name": "@ijuantm/simpl",
-  "description": "CLI for the Simpl PHP framework: create projects, install add-ons and run the Docker dev stack.",
-  "version": "1.0.0",
+  "description": "Simpl commandline tool for installing, adding add-ons and running project commands and scripts.",
+  "version": "1.0.1",
   "type": "module",
   "bin": {
     "simpl": "bin/simpl.js"

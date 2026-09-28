@@ -99,7 +99,7 @@ Docker is the default: `simpl up` serves the project and `simpl composer`, `simp
 <releases>/<version>/add-ons/<name>.zip
 ```
 
-`<releases>` is the `SIMPL_LOCAL_RELEASES` environment variable, or `simpl-local-releases` in the current folder. With `--local` the CDN is never contacted: the versions are the folders in `<releases>` (`latest` is the highest one), and a missing zip is reported as missing from that folder. Without `--local`, everything comes from the CDN.
+`<releases>` is the `SIMPL_LOCAL_RELEASES` environment variable, or `simpl-local-releases` in the current folder. With `--local` the CDN is never contacted: the versions are the folders in `<releases>` (`latest` is the highest one that isn't a pre-release), and a missing zip is reported as missing from that folder. Without `--local`, everything comes from the CDN.
 
 ## Scripting
 
