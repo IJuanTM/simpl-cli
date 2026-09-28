@@ -1,0 +1,28 @@
+#!/usr/bin/env node
+import {execFileSync} from 'node:child_process';
+import fs from 'node:fs';
+
+const [remote] = process.argv.slice(2);
+const ZERO = /^0+$/;
+
+const versionAt = (sha) => JSON.parse(execFileSync('git', ['show', `${sha}:package.json`], {encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore']})).version;
+const fail = (msg) => {
+  console.error(`\n  ✕ ${msg}\n`);
+  process.exit(1);
+};
+
+for (const pushed of fs.readFileSync(0, 'utf8').split('\n').filter(Boolean)) {
+  const [, localSha, remoteRef, remoteSha] = pushed.split(' ');
+  if (remoteRef !== 'refs/heads/master' || ZERO.test(localSha) || ZERO.test(remoteSha)) continue;
+
+  let previous;
+  try {
+    previous = versionAt(remoteSha);
+  } catch {
+    fail(`${remote}/master is ahead of your local copy, run git fetch first`);
+  }
+  const version = versionAt(localSha);
+  const [major, minor, patch] = previous.split('.').map(Number);
+  const next = [`${major}.${minor}.${patch + 1}`, `${major}.${minor + 1}.0`, `${major + 1}.0.0`];
+  if (!next.includes(version)) fail(`package.json version ${version} does not follow ${previous}. Bump it to ${next.join(', ')} before pushing to master.`);
+}
