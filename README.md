@@ -43,18 +43,22 @@ Every command except `new` works from any folder inside a project, found by walk
 simpl new
 simpl new "My Project" --url=http://my-project.local
 simpl new --version=latest --name="Simpl Test"
+simpl new "My Project" --tests
 simpl new --list-versions
 ```
 
-| Option                | Description                                            |
-|-----------------------|--------------------------------------------------------|
-| `--name`, `-n <name>` | Project name (also accepted as the first argument).    |
-| `--url`, `-u <url>`   | App URL, must start with `http://` or `https://`.      |
-| `--version`, `-v <v>` | Framework version, or `latest` for the newest release. |
-| `--local`             | Only use local release files (see below).              |
-| `--list-versions`     | List all available versions.                           |
+| Option                | Description                                                  |
+|-----------------------|--------------------------------------------------------------|
+| `--name`, `-n <name>` | Project name (also accepted as the first argument).          |
+| `--url`, `-u <url>`   | App URL, must start with `http://` or `https://`.            |
+| `--version`, `-v <v>` | Framework version, or `latest` for the newest release.       |
+| `--tests`             | Include Simpl's own tests, also for add-ons installed later. |
+| `--local`             | Only use local release files (see below).                    |
+| `--list-versions`     | List all available versions.                                 |
 
 The project gets a `src/.env` copied from `src/.env.example`, with `APP_NAME` and `APP_URL` set to the project name and URL.
+
+Every project gets the PHPUnit setup, the test helpers and an `ExampleTest.php` per test suite, so `simpl test` works right away. Simpl's own test classes (every other `*Test.php` under `tests/`) are only installed with `--tests`, which adds `"tests": true` to the project's `.simpl` file.
 
 ### `simpl add`
 
@@ -69,25 +73,28 @@ simpl add --list
 | `--list`, `-l` | List the add-ons available for this project. |
 | `--local`      | Only use local release files (see below).    |
 
-The add-on version always matches the framework version in the project's `.simpl` file. Add-ons that depend on another add-on offer to install that one first.
+The add-on version always matches the framework version in the project's `.simpl` file. Add-ons that depend on another add-on offer to install that one first. An add-on's own tests are installed when that file has `"tests": true`, which `simpl new --tests` sets.
 
-Files that don't exist in the project yet are copied. Existing files are merged using the markers in the add-on's copy of the file, and are skipped if it has none:
+Files that don't exist in the project yet are copied. A file that already exists is merged when the add-on's copy holds blocks for it, and skipped otherwise. A block is the lines between an `@addon-insert:<name>` line and the next `@addon-end` line:
 
 ```php
-// @addon-insert:after('existing line')
+// @addon-insert:controllers
 new AuthController();
 // @addon-end
 ```
 
-| Marker                          | Effect                                          |
-|---------------------------------|-------------------------------------------------|
-| `@addon-insert:after('text')`   | Insert after the first line containing `text`.  |
-| `@addon-insert:before('text')`  | Insert before the first line containing `text`. |
-| `@addon-insert:replace('text')` | Replace the first line containing `text`.       |
-| `@addon-insert:prepend`         | Add to the start of the file.                   |
-| `@addon-insert:append`          | Add to the end of the file.                     |
+The project's file marks where a block goes with a line containing `@addon-placeholder:<name>`, in whatever comment style the file uses:
 
-Content that is already present is not added again, so re-running an install is safe. An add-on's `src/.env.example` is merged into the project's `src/.env.example`, adding only variables that aren't defined yet, and those variables are then added to `src/.env` as well, with an empty `APP_KEY` generated. If the line a marker points to can't be found, that part is not added: the install still finishes, lists the affected files at the end and exits with code 1. The add-on is then not marked as installed in `.simpl`, so running the same command again after fixing those files finishes the install, skipping everything that was already added.
+```php
+new SessionController();
+// @addon-placeholder:controllers
+```
+
+The block's lines are added above the placeholder line, at its indentation. The placeholder stays in the file, so every add-on that has a block for it adds its lines there. A name is made of letters, digits, hyphens and underscores. The name `append` needs no placeholder: `@addon-insert:append` adds the block to the end of the file.
+
+A `.json` file is merged by key instead: keys the project's file doesn't have yet are added, at any depth, and values it already has are kept. An add-on's `src/.env.example` is merged into the project's `src/.env.example`, adding only variables that aren't defined yet, and those variables are then added to `src/.env` as well, with an empty `APP_KEY` generated.
+
+If a placeholder can't be found, none of the add-on's blocks for that file are added: the install still finishes, lists the affected files at the end and exits with code 1. The add-on is then not listed under `addons` in `.simpl`, so running the same command again after restoring the placeholder finishes the install. The files an add-on has added its blocks to are listed under `merged` in `.simpl`, and a repeated install leaves those files alone. Remove a path from that list to have its blocks added again, for example after restoring the file to an older version.
 
 ### `simpl env`
 
@@ -116,7 +123,7 @@ Docker is the default: `simpl up` serves the project and `simpl composer`, `simp
 <releases>/<version>/add-ons/<name>.zip
 ```
 
-`<releases>` is the `SIMPL_LOCAL_RELEASES` environment variable, or `simpl-local-releases` in the current folder. With `--local` the CDN is never contacted: the versions are the folders in `<releases>` (`latest` is the highest one that isn't a pre-release), and a missing zip is reported as missing from that folder. Without `--local`, everything comes from the CDN.
+`<releases>` is the `SIMPL_LOCAL_RELEASES` environment variable, or `simpl-local-releases` in the current folder. With `--local` the CDN is never contacted: the versions are the folders in `<releases>` (`latest` is the highest one that isn't a pre-release, which is a version ending in `a` or `b`, e.g. `2.1.0a`), and a missing zip is reported as missing from that folder. Without `--local`, everything comes from the CDN.
 
 ## Scripting
 
