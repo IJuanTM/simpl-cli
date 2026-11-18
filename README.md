@@ -23,7 +23,8 @@ npx @ijuantm/simpl new
 | `simpl new [name]`      | Create a new project in a new folder (alias: `simpl install`).                             |
 | `simpl add [add-on]`    | Install an add-on into the current project (aliases: `simpl add-on`, `simpl addon`).       |
 | `simpl env`             | Create `src/.env` from `src/.env.example`, or add the variables it is missing.             |
-| `simpl up`              | Build and start the Docker stack (`docker compose build --pull`, then `up -d`).            |
+| `simpl up`              | Build and start the Docker stack (`build --pull`, then `up -d`), then list its URLs.       |
+| `simpl urls`            | Show the URLs and ports of the running services (site, phpMyAdmin, Mailpit, database).     |
 | `simpl down`            | Stop the Docker stack (`docker compose down`).                                             |
 | `simpl logs`            | Show container logs (`docker compose logs`), e.g. `simpl logs -f app`.                     |
 | `simpl sh`              | Open a shell in the app container, as the same user Apache runs as.                        |

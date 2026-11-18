@@ -2,7 +2,7 @@
 import pkg from '../package.json' with {type: 'json'};
 import * as add from '../lib/commands/add.js';
 import {composer, composerScript, SHORTCUTS} from '../lib/commands/composer.js';
-import {down, logs, sh, up} from '../lib/commands/docker.js';
+import {down, logs, sh, up, urls} from '../lib/commands/docker.js';
 import * as env from '../lib/commands/env.js';
 import * as help from '../lib/commands/help.js';
 import * as newProject from '../lib/commands/new.js';
@@ -20,7 +20,7 @@ const commands = {
   new: newProject.run, install: newProject.run,
   add: add.run, 'add-on': add.run, addon: add.run,
   env: env.run,
-  up, down, logs, sh, composer,
+  up, down, logs, sh, urls, composer,
   help: ([topic]) => {
     if (!topic) return help.general(pkg.version);
     if (!Object.hasOwn(topicHelp, topic)) throw new CliError(`Unknown help topic: ${topic}`, 'Topics: manual, new, add, env.');

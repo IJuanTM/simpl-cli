@@ -1,7 +1,7 @@
 {
   "name": "@ijuantm/simpl",
   "description": "Simpl commandline tool for installing, adding add-ons and running project commands and scripts.",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "type": "module",
   "bin": {
     "simpl": "bin/simpl.js"
